@@ -13,10 +13,9 @@ class MyTimer{
  public:
   /**
    * @brief Construct a new Timer object
-   * Init timer01 and set working period(500ms)
    * 
    */
-  MyTimer();
+  MyTimer() = default;
   /**
    * @brief 
    * 
@@ -26,7 +25,7 @@ class MyTimer{
    * @brief Destroy the My Timer object
    * 
    */
-  ~MyTimer() = default;
+  virtual ~MyTimer() = default;
   /**
    * @brief 
    * 
@@ -37,7 +36,7 @@ class MyTimer{
    * @brief 
    * 
    */
-  void start_timer();
+  void start_timer(const int period);
   /**
    * @brief 
    * 
@@ -53,7 +52,7 @@ class MyTimer{
    * 
    * @return unsigned long* 
    */
-  const unsigned long int* get_timer_reg() const;
+  const unsigned long int* get_timer_ptr() const;
   /**
    * @brief Get the act time object
    * 
@@ -64,8 +63,6 @@ class MyTimer{
  private:
   //
   os_timer_t os_timer01 {};
-  //
-  unsigned long int* timer_ptr = nullptr;
   //
   unsigned long int timer = 0;
 };

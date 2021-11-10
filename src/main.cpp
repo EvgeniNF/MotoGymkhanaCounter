@@ -1,11 +1,11 @@
 #include <Arduino.h>
 #include <MyTimer.hpp>
 
-mytimer::MyTimer timer01;
+mytimer::MyTimer timer01(1);
 
-
-void setup() {
-  timer01.start_timer();
+void setup(){
+  Serial.begin(9600);
+  
 }
 
 void loop() {
