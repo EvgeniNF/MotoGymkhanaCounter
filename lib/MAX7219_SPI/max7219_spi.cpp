@@ -42,6 +42,7 @@ void MAX7219_SPI::begin(const int cs_pin) {
   spi_transfer(9, 0);
   clear_display();
   shutdown(true);
+  spi_transfer(10, 15);
 }
 
 void MAX7219_SPI::spi_transfer(volatile byte opcode, volatile byte data){
