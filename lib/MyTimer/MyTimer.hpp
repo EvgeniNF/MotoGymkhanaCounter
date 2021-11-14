@@ -63,6 +63,8 @@ class MyTimer{
  private:
   //
   os_timer_t os_timer01 {};
+  
+ protected:
   //
   unsigned long int timer = 0;
 };

@@ -1,27 +1,34 @@
 #include <Arduino.h>
-#include <max7219_spi.hpp>
-#include <MyTimer.hpp>
+#include <logic.hpp>
 
-max7219_spi::MAX7219_SPI disp(D8);
-mytimer::MyTimer t01(1);
+Logic logic;
+
+void IRAM_ATTR sensor_iterupt();
+void IRAM_ATTR button_iterupt();
 
 void setup() {
-  disp.shutdown(false);
-  /* and clear the display */
-  disp.clear_display();
+  // Set pins mode
+  pinMode(D3, INPUT_PULLUP);
+  pinMode(D2, INPUT_PULLUP);
+
+  // Set interrupt functions
+  attachInterrupt(digitalPinToInterrupt(D3), sensor_iterupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(D2), button_iterupt, FALLING);
+  
+  // Init dispalay 
+  logic.init(D8);
 }
 
-void for_each_digit(int input){
-  if (input == 0) { return; };    
-  int current = input % 10;
-  for_each_digit(input / 10); // recurse *first*, then process
-
+void loop() {
+  // Main work
+  logic.main_work();
 }
 
-void loop() { 
-  disp.clear_display();
-  for(int i = 0; i < 8; i++){
-    disp.set_digit(i, 0);
-  }
+void sensor_iterupt(){
+  logic.sensor_signal();
+}
+
+void button_iterupt(){
+  logic.reset_signal();
 }
 
