@@ -17,6 +17,7 @@ void setup() {
   
   // Init dispalay 
   logic.init(D8);
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -26,6 +27,7 @@ void loop() {
 
 void sensor_iterupt(){
   logic.sensor_signal();
+  Serial.print("Sensor\n");
 }
 
 void button_iterupt(){

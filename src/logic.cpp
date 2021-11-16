@@ -1,6 +1,7 @@
 #include "../include/logic.hpp"
 
 void Logic::init(int cs_disp_pin, unsigned short int _update_period){
+  // Initialisation function
   this->update_period = _update_period;
   this->begin(D8);
   this->shutdown(false);  
@@ -13,27 +14,44 @@ void Logic::init(int cs_disp_pin, unsigned short int _update_period){
   this->set_digit(5, 0, true);
   this->set_digit(6, 0);
   this->set_digit(7, 0, true);
+  st_timer = State::READY;
 }
 
 void Logic::main_work(){
-  if (this->timer > this->prev_time)
+  // Update period in count state
+  if (this->timer > this->prev_time && st_timer == State::COUNT)
     this->update_display();
 }
 
 void Logic::sensor_signal(){
-  if (this->timer == 0){
+  if (st_timer == State::NOT_INIT) 
+    return;
+  if (this->timer == 0 && st_timer == State::READY){
+    // Start timer
+    this->update_display();
     this->start_timer(1);
-  } else if (this->timer > 3'000){
+    st_timer = State::COUNT;
+  } else if (this->timer > 3'000 && st_timer == State::COUNT){
+    // Stop timer
     this->stop_timer();
     this->update_display();
-  }  
+    st_timer = State::STOPED;
+    this->start_timer(1);
+  } else if (this->timer > 1'500 && st_timer == State::STOPED){
+    // Delay after stop timer
+    this->stop_timer();
+    this->reset_timer();
+    st_timer = State::READY;
+  }
 }
 
 void Logic::reset_signal(){
-  if (this->timer != 0){
+  if (this->timer != 0 && st_timer != State::NOT_INIT){
+    // Reset timer
     this->stop_timer();
     this->reset_timer();
     this->update_display();
+    st_timer = State::READY;
   }
 }
 
