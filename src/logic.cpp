@@ -1,9 +1,10 @@
 #include "../include/logic.hpp"
+#include <string>
 
-void Logic::init(int cs_disp_pin, unsigned short int _update_period){
+void Logic::init_display(int cs_disp_pin, unsigned short int _update_period){
   // Initialisation function
   this->update_period = _update_period;
-  this->begin(D8);
+  this->begin_display(D8);
   this->shutdown(false);  
   this->clear_display();
   this->set_digit(0, 0);
@@ -14,13 +15,19 @@ void Logic::init(int cs_disp_pin, unsigned short int _update_period){
   this->set_digit(5, 0, true);
   this->set_digit(6, 0);
   this->set_digit(7, 0, true);
-  st_timer = State::READY;
+  this->st_timer = State::READY;
 }
 
 void Logic::main_work(){
   // Update period in count state
   if (this->timer > this->prev_time && st_timer == State::COUNT)
     this->update_display();
+  String req = String(static_cast<unsigned short int>(this->st_timer));
+  req += ';';
+  req += String(this->timer);
+  req += ';';
+  req += String(millis());
+  this->send_request(req);
 }
 
 void Logic::sensor_signal(){
@@ -37,7 +44,7 @@ void Logic::sensor_signal(){
     this->update_display();
     st_timer = State::STOPED;
     this->start_timer(1);
-  } else if (this->timer > 1'500 && st_timer == State::STOPED){
+  } else if (this->timer > 3'000 && st_timer == State::STOPED){
     // Delay after stop timer
     this->stop_timer();
     this->reset_timer();

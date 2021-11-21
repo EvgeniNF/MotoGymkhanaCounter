@@ -3,10 +3,13 @@
 
 Logic logic;
 
+
+
 void IRAM_ATTR sensor_iterupt();
 void IRAM_ATTR button_iterupt();
 
 void setup() {
+
   // Set pins mode
   pinMode(D3, INPUT_PULLUP);
   pinMode(D2, INPUT_PULLUP);
@@ -15,9 +18,17 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(D3), sensor_iterupt, FALLING);
   attachInterrupt(digitalPinToInterrupt(D2), button_iterupt, FALLING);
   
+  // Iinit wifi
+  logic.init_wifi("MotoCounter",
+                "19741974", 
+                {192, 168, 100, 1},
+                {192, 168, 100, 1},
+                {255, 255, 255, 0},
+                80);
+
+  
   // Init dispalay 
-  logic.init(D8);
-  Serial.begin(9600);
+  logic.init_display(D8);
 }
 
 void loop() {
@@ -26,11 +37,12 @@ void loop() {
 }
 
 void sensor_iterupt(){
+  // Sensor interupt
   logic.sensor_signal();
-  Serial.print("Sensor\n");
 }
 
 void button_iterupt(){
+  // Button interupt
   logic.reset_signal();
 }
 

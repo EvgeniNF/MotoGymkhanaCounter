@@ -28,20 +28,65 @@ const static byte charTable [] PROGMEM  = {
 class MAX7219_SPI{
  
  public:
- 
+  /**
+   * @brief Construct a new max7219 spi object
+   * 
+   */
   MAX7219_SPI() = default;
+  /**
+   * @brief Construct a new max7219 spi object and start work whith display
+   * 
+   * @param _cs_pin Chip select pin
+   */
   explicit MAX7219_SPI(const int _cs_pin);
+  /**
+   * @brief Destroy the max7219 spi object
+   * 
+   */
   ~MAX7219_SPI() = default;
+  /**
+   * @brief Function clear display
+   * 
+   */
   void clear_display();
-  void spi_transfer(volatile byte opcode, volatile byte data);
-  void shutdown(bool b);
+  /**
+   * @brief Set the digit object
+   * 
+   * @param digit Number of digit on display (0..7)
+   * @param value Number (0..9)
+   * @param dp Dot status
+   */
   void set_digit(int digit, byte value, bool dp=false);
-  void begin(int cs_pin);
+  /**
+   * @brief Function init display
+   * 
+   * @param cs_pin Chip select pin
+   */
+  void begin_display(int cs_pin);
+  /**
+   * @brief Shutdown mode
+   * 
+   * @param b true - on, false - off 
+   */
+  void shutdown(bool b);
   
  private:
-
+  /**
+   * @brief SPI transaction
+   * 
+   * @param opcode Function code
+   * @param data Data
+   */
+  void spi_transfer(volatile byte opcode, volatile byte data);
+  
+  
+  
+ private:
+  // Data for transfer
   byte spidata[2] {0x00, 0x00};
+  // Select pin
   int spi_cs = 0;
+  // Transfer speed
   unsigned long spi_speed = 1'000'000;
 
 };

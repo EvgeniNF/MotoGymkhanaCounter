@@ -23,7 +23,7 @@ MAX7219_SPI::MAX7219_SPI(int cs_pin) : spi_cs(cs_pin) {
   spi_transfer(10, 15);
 }
 
-void MAX7219_SPI::begin(const int cs_pin) {
+void MAX7219_SPI::begin_display(const int cs_pin) {
   spi_cs = cs_pin;
   // Set pin mode for SPI pins
   pinMode(MOSI, OUTPUT);
