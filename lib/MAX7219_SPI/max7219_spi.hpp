@@ -79,11 +79,15 @@ class MAX7219_SPI{
    */
   void spi_transfer(volatile byte opcode, volatile byte data);
   
-  
-  
  private:
-  // Data for transfer
-  byte spidata[2] {0x00, 0x00};
+  enum class Status_display{
+    NOT_INIT,
+    RUN
+  };
+
+ private:
+  // Status display
+  Status_display status = Status_display::NOT_INIT;
   // Select pin
   int spi_cs = 0;
   // Transfer speed

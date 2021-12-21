@@ -15,16 +15,20 @@ MAX7219_SPI::MAX7219_SPI(int cs_pin) : spi_cs(cs_pin) {
   // Statrt SPI
   SPI.begin();
   digitalWrite(spi_cs, HIGH);  
-  spi_transfer(15, 0);
-  spi_transfer(11, 7);
-  spi_transfer(9, 0);
-  clear_display();
-  shutdown(true);
-  spi_transfer(10, 15);
+  this->spi_transfer(15, 0);
+  this->spi_transfer(11, 7);
+  this->spi_transfer(9, 0);
+  this->clear_display();
+  this->shutdown(true);
+  this->spi_transfer(10, 15);
+  
+  this->status = Status_display::RUN;
 }
 
 void MAX7219_SPI::begin_display(const int cs_pin) {
-  spi_cs = cs_pin;
+  
+  this->spi_cs = cs_pin;
+  
   // Set pin mode for SPI pins
   pinMode(MOSI, OUTPUT);
   pinMode(SCK, OUTPUT);
@@ -37,56 +41,56 @@ void MAX7219_SPI::begin_display(const int cs_pin) {
   // Statrt SPI
   SPI.begin();
   digitalWrite(spi_cs, HIGH);  
-  spi_transfer(15, 0);
-  spi_transfer(11, 7);
-  spi_transfer(9, 0);
-  clear_display();
-  shutdown(true);
-  spi_transfer(10, 15);
+  this->spi_transfer(15, 0);
+  this->spi_transfer(11, 7);
+  this->spi_transfer(9, 0);
+  this->clear_display();
+  this->shutdown(true);
+  this->spi_transfer(10, 15);
+
+  this->status = Status_display::RUN;
 }
 
 void MAX7219_SPI::spi_transfer(volatile byte opcode, volatile byte data){
-  //Create an array with the data to shift out
-  spidata[0] = static_cast<byte>(0);
-  spidata[1] = static_cast<byte>(0);
 
-  //put our device data into the array
-  spidata[1] = opcode;
-  spidata[0] = data;
-  
-  //enable the line
+  //Enable the line
   digitalWrite(spi_cs, LOW);
   
   //Now shift out the data
   SPI.beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE0));
-  SPI.transfer(spidata[1]);
-  SPI.transfer(spidata[0]);
+  SPI.transfer(opcode);
+  SPI.transfer(data);
   
-  //latch the data onto the display
+  //Latch the data into the display
   digitalWrite(spi_cs, HIGH);
   SPI.endTransaction();
-
 }
 
 void MAX7219_SPI::clear_display() {
   for(int i = 0; i < 8; i++)
-    spi_transfer(i + 1, 0);
+    this->spi_transfer(i + 1, 0);
 }
 
 void MAX7219_SPI::shutdown(bool b) {
   if(b)
-    spi_transfer(12, 0);
+    this->spi_transfer(12, 0);
   else
-    spi_transfer(12, 1);
+    this->spi_transfer(12, 1);
 } 
 
 void MAX7219_SPI::set_digit(int digit, byte value, bool dp){
+  if (status == Status_display::NOT_INIT)
+    return;
+
   if(digit < 0 || digit > 7 || value > 9)
     return;
+
   value = pgm_read_byte_near(charTable + value); 
+  
   if(dp)
     value |= B10000000;
-  spi_transfer(digit + 1, value);
+
+  this->spi_transfer(digit + 1, value);
 }
 
 }

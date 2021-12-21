@@ -3,6 +3,7 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266HTTPUpdateServer.h>
 
 namespace wifi_server{
 
@@ -10,7 +11,7 @@ class Wifi_server : public ESP8266WebServer {
   
  public:
 
-  Wifi_server() = default;
+  Wifi_server() = default; 
 
   Wifi_server(const String& _ssid, const String& _pass, IPAddress local_ip, IPAddress gateway, IPAddress subnet, int port);
   
@@ -21,6 +22,8 @@ class Wifi_server : public ESP8266WebServer {
   ~Wifi_server() = default;
 
   void init_wifi(const String& _ssid, const String& _pass, IPAddress local_ip, IPAddress gateway, IPAddress subnet, int port);
+  
+  void send_request(String mess);
 
  private:
 
@@ -31,11 +34,7 @@ class Wifi_server : public ESP8266WebServer {
     ERROR = 3,
     NOT_INIT = 4  
   };
-
- protected:
-
-  void send_request(String mess);
-
+  
  private:
 
   static void handle_resive_data();
@@ -43,8 +42,9 @@ class Wifi_server : public ESP8266WebServer {
   static void handle_not_found();
 
  private:
- 
-   static Status_wifi status;
+
+  ESP8266HTTPUpdateServer httpUpdater;
+  static Status_wifi status;
 };
 
 }

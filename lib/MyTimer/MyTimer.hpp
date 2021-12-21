@@ -65,10 +65,10 @@ class MyTimer{
  private:
   // Timer obj
   os_timer_t os_timer01 {};
-  
- protected:
   // Timer register
   unsigned long int timer = 0;
+  
+  
 };
 
 }

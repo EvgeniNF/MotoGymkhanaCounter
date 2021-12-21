@@ -1,6 +1,14 @@
 #include <Arduino.h>
 #include <logic.hpp>
 
+namespace pin{
+
+const int sensor{D1};
+const int button_reset{D2};
+const int indicator{D3};
+
+}
+
 Logic logic;
 
 
@@ -9,26 +17,23 @@ void IRAM_ATTR sensor_iterupt();
 void IRAM_ATTR button_iterupt();
 
 void setup() {
-
   // Set pins mode
-  pinMode(D3, INPUT_PULLUP);
-  pinMode(D2, INPUT_PULLUP);
+  logic.init_pins(pin::sensor, pin::button_reset, pin::indicator);
 
-  // Set interrupt functions
-  attachInterrupt(digitalPinToInterrupt(D3), sensor_iterupt, FALLING);
-  attachInterrupt(digitalPinToInterrupt(D2), button_iterupt, FALLING);
-  
   // Iinit wifi
-  logic.init_wifi("MotoCounter",
+  logic.init_wifi_server("MotoCounter1",
                 "19741974", 
                 {192, 168, 100, 1},
                 {192, 168, 100, 1},
                 {255, 255, 255, 0},
                 80);
-
   
   // Init dispalay 
   logic.init_display(D8);
+  
+  // Set interrupt functions
+  attachInterrupt(digitalPinToInterrupt(pin::sensor), sensor_iterupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(pin::button_reset), button_iterupt, CHANGE);
 }
 
 void loop() {
@@ -43,6 +48,6 @@ void sensor_iterupt(){
 
 void button_iterupt(){
   // Button interupt
-  logic.reset_signal();
+  logic.reset_button_signal();
 }
 
