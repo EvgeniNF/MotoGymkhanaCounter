@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <logic.hpp>
-
+#include <MyTimer.hpp>
 namespace pin{
 
 const int sensor{D1};
@@ -11,22 +11,14 @@ const int indicator{D3};
 
 Logic logic;
 
-
-
 void IRAM_ATTR sensor_iterupt();
 void IRAM_ATTR button_iterupt();
 
 void setup() {
   // Set pins mode
   logic.init_pins(pin::sensor, pin::button_reset, pin::indicator);
-
   // Iinit wifi
-  logic.init_wifi_server("MotoCounter1",
-                "19741974", 
-                {192, 168, 100, 1},
-                {192, 168, 100, 1},
-                {255, 255, 255, 0},
-                80);
+  logic.init_server();
   
   // Init dispalay 
   logic.init_display(D8);

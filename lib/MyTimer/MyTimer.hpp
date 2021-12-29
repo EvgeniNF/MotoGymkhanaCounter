@@ -5,8 +5,15 @@
 #include <gpio.h>
 #include <ets_sys.h>
 #include <user_interface.h>
+#include <memory>
 
 namespace mytimer{
+
+struct TimerData{
+  unsigned long int time{};
+  unsigned long int start_time{};
+};
+
 
 class MyTimer{
  
@@ -15,7 +22,7 @@ class MyTimer{
    * @brief Construct a new Timer object
    * 
    */
-  MyTimer() = default;
+  MyTimer();
   /**
    * @brief Construct a new My Timer object and starts the timer
    * 
@@ -63,10 +70,11 @@ class MyTimer{
   unsigned long int get_act_time() const;
 
  private:
+  void update_time();
   // Timer obj
   os_timer_t os_timer01 {};
   // Timer register
-  unsigned long int timer = 0;
+  std::shared_ptr<TimerData> timer_data;
   
   
 };

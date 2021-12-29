@@ -2,9 +2,10 @@
 #define INCLUDE_LOGIC_HPP
 
 #include <Arduino.h>
-#include <wifi_server.hpp>
+#include <Server.hpp>
 #include <MyTimer.hpp>
 #include <max7219_spi.hpp>
+#include <NetworkData.hpp>
 
 
 class Logic{
@@ -18,14 +19,14 @@ class Logic{
    * @brief Destroy the Logic object
    * 
    */
-  ~Logic() = default;
+  ~Logic();
   /**
    * @brief Init display
    * 
    * @param cs_disp_pin Chip select pin 
    * @param _update_period Display update period
    */
-  void init_display(int cs_disp_pin, unsigned short int _update_period = 142);
+  void init_display(int cs_disp_pin, unsigned short int _update_period = 50);
   /**
    * @brief Init server
    * 
@@ -36,7 +37,7 @@ class Logic{
    * @param subnet Net mask
    * @param port Port
    */
-  void init_wifi_server(const String& _ssid, const String& _pass, IPAddress local_ip, IPAddress gateway, IPAddress subnet, int port);
+  void init_server();
   /**
    * @brief Loop function
    * 
@@ -110,7 +111,7 @@ class Logic{
   // Timer
   mytimer::MyTimer timer_{};
   // Server
-  wifi_server::Wifi_server server_{};
+  server::Server server_{};
   // Timer pointer
   const unsigned long int* timer_register_ptr{};
   // Result of counter
@@ -133,6 +134,8 @@ class Logic{
   const unsigned int button_reset_filter_time { 100 };
   // Prev time button
   unsigned long int prev_time_button {0};
+  // Networck data
+  NetworkData _data{};
 };
 
 #endif // INCLUDE_LOGIC_HPP

@@ -5,8 +5,14 @@ Logic::Logic()
             : display_()
             , timer_()
             , server_() {
-  this->timer_register_ptr = this->timer_.get_timer_ptr();
+  this->_data.timer_time = this->timer_.get_timer_ptr();
+  this->_data.time_on_esp = new unsigned long int(millis());
+  this->_data.status = reinterpret_cast<unsigned short int*>(&this->state);
   state = Logic::State::NOT_INIT;
+}
+
+Logic::~Logic(){
+  delete this->_data.time_on_esp;
 }
 
 void Logic::init_display(int cs_disp_pin, 
@@ -35,14 +41,9 @@ void Logic::init_display(int cs_disp_pin,
     this->state = State::READY;
 }
 
-void Logic::init_wifi_server(const String& _ssid,
-                             const String& _pass, 
-                             IPAddress local_ip, 
-                             IPAddress gateway, 
-                             IPAddress subnet, 
-                             int port){
+void Logic::init_server(){
   // Init wifi server
-  this->server_.init_wifi(_ssid, _pass, local_ip, gateway, subnet, port);
+  this->server_.initializationServer(&this->_data);
   // Set state Display ready
   if (state == Logic::State::NOT_INIT)
     this->state = State::WIFI_INIT;
@@ -51,23 +52,12 @@ void Logic::init_wifi_server(const String& _ssid,
 }
 
 void Logic::main_work(){
-  
-  digitalRead(D1) ? digitalWrite(D3, HIGH) : digitalWrite(D3, LOW);
-
-  // Send request
-  String req = String(static_cast<unsigned short int>(this->state));
-  req += ';';
-
-  this->state == State::STOPED ? req += String(this->result) : req += String(*this->timer_register_ptr);
-  req += ';';
-
-  req += String(millis());
-  req += ';';
-
-  this->server_.send_request(req);
+  *this->_data.time_on_esp = millis();
+  this->server_.loopUpdateWebServer();
 
   // Update period in count state
-  if (*this->timer_register_ptr > this->prev_time && this->state == State::COUNT)
+  if (*this->_data.timer_time > this->prev_time &&
+       this->state == State::COUNT)
     this->update_display();
   
   this->handle_reset_button();
@@ -78,20 +68,20 @@ void Logic::sensor_signal(){
       this->state == Logic::State::DISPLAY_INIT ||
       this->state == Logic::State::WIFI_INIT) 
     return;
-  if (*this->timer_register_ptr == 0 && this->state == State::READY){
+  if (*this->_data.timer_time == 0 && this->state == State::READY){
     // Start timer
     this->update_display();
     this->timer_.start_timer(1);
     state = State::COUNT;
-  } else if (*this->timer_register_ptr > 3'000 && this->state == State::COUNT){
+  } else if (*this->_data.timer_time > 3'000 && this->state == State::COUNT){
     // Stop timer
     this->timer_.stop_timer();
-    this->result = *this->timer_register_ptr;
+    this->result = *this->_data.timer_time;
     this->update_display();
     this->timer_.reset_timer();
     this->timer_.start_timer(1);
     this->state = State::STOPED;
-  } else if (*this->timer_register_ptr > 3'000 && this->state == State::STOPED){
+  } else if (*this->_data.timer_time > 3'000 && this->state == State::STOPED){
     // Delay after stop timer
     this->timer_.stop_timer();
     this->timer_.reset_timer();
@@ -102,7 +92,7 @@ void Logic::sensor_signal(){
 }
 
 void Logic::update_display(){
-  this->prev_time = *this->timer_register_ptr;
+  this->prev_time = *this->_data.timer_time;
   int act_time = 0;
   for (int index = 0; index < 4; index++){
     act_time = static_cast<int>(this->prev_time / this->time_convers[index]);
@@ -116,7 +106,7 @@ void Logic::update_display(){
     else
       this->set_digit_on_disp(0, 3, act_time);         
   }
-  this->prev_time = *this->timer_register_ptr + this->update_period;    
+  this->prev_time = *this->_data.timer_time + this->update_period;    
 }
 
 void Logic::set_digit_on_disp(int offset, 
