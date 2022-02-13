@@ -1,76 +1,75 @@
 #include "../include/logic.hpp"
+
 #include <string>
 
 Logic::Logic() 
-            : display_()
-            , timer_()
-            , server_() {
-  this->_data.timer_time = this->timer_.get_timer_ptr();
-  this->timer_register_ptr = this->timer_.get_timer_ptr();
-  this->_data.time_on_esp = new unsigned long int(millis());
-  this->_data.status = reinterpret_cast<unsigned short int*>(&this->state);
-  state = Logic::State::NOT_INIT;
+            : m_display()
+            , m_timer()
+            , m_server() {
+  this->m_networkData.m_timerTime = this->m_timer.getTimerPtr();
+  this->m_timerRegisterPtr = this->m_timer.getTimerPtr();
+  this->m_networkData.m_timeOnEsp = new unsigned long int(millis());
+  this->m_networkData.m_espStatus = reinterpret_cast<unsigned short int*>(&this->state);
+  this->m_state = STATE::NOT_INIT;
 }
 
-Logic::~Logic(){
-  delete this->_data.time_on_esp;
+Logic::~Logic() {
+  delete this->m_networkData.m_timeOnEsp;
+}
+void Logic::setZerosOnDisplay() {
+  // Set zeros on the display
+  this->m_display.setDigit(0, 0);
+  this->m_display.setDigit(1, 0);
+  this->m_display.setDigit(2, 0);
+  this->m_display.setDigit(3, 0, true);
+  this->m_display.setDigit(4, 0);
+  this->m_display.setDigit(5, 0, true);
+  this->m_display.setDigit(6, 0);
+  this->m_display.setDigit(7, 0, true); 
 }
 
-void Logic::init_display(int cs_disp_pin, 
-                         unsigned short int _update_period){
+void Logic::initDisplay(int csDisplayPin, 
+                         unsigned short int updatePeriod){
    
   // Initialisation display function
-  this->update_period = _update_period;
-  this->display_.begin_display(D8);
-  this->display_.shutdown(false);  
-  this->display_.clear_display();
+  this->m_updatePeriod = updatePeriod;
+  this->m_display.beginDisplay(D8);
+  this->m_display.shutdown(false);  
+  this->m_display.clearDisplay();
+  this->setZerosOnDisplay();
 
-  // Set zeros on the display
-  this->display_.set_digit(0, 0);
-  this->display_.set_digit(1, 0);
-  this->display_.set_digit(2, 0);
-  this->display_.set_digit(3, 0, true);
-  this->display_.set_digit(4, 0);
-  this->display_.set_digit(5, 0, true);
-  this->display_.set_digit(6, 0);
-  this->display_.set_digit(7, 0, true);
-
-  // Set state Display ready
-  if (state == Logic::State::NOT_INIT)
-    this->state = State::DISPLAY_INIT;
-  else if (state == Logic::State::WIFI_INIT)
-    this->state = State::READY;
+  // Set state 
+  if (this->m_state == STATE::NOT_INIT)
+    this->m_state = STATE::DISPLAY_INIT;
+  else if (this->m_state == STATE::WIFI_INIT)
+    this->m_state = STATE::READY;
 }
 
-void Logic::init_server(){
+void Logic::initServer(){
   // Init wifi server
-  this->server_.initializationServer(&this->_data,
+  this->m_server.initializationServer(&this->m_networkData,
                 std::bind(&Logic::reboot, this),
                 std::bind(&Logic::resetTimer, this));
+  
   // Set state Display ready
-  if (state == Logic::State::NOT_INIT)
-    this->state = State::WIFI_INIT;
-  else if (state == Logic::State::DISPLAY_INIT)
-    this->state = State::READY;
+  if (this->m_state == STATE::NOT_INIT)
+    this->m_state = STATE::WIFI_INIT;
+  else if (this->m_state == STATE::DISPLAY_INIT)
+    this->m_state = STATE::READY;
 }
 
-void Logic::main_work(){
-  
-  *this->_data.time_on_esp = millis();
-
-  if (this->state == State::STOPED) {
-    this->_data.timer_time = &result;
+void Logic::mainWork(){
+  *this->m_networkData.m_timeOnEsp = millis();
+  if (this->m_state == STATE::STOPED) {
+    this->m_networkData.m_timerTime = &this->m_countResult;
   } else {
-    this->_data.timer_time = this->timer_.get_timer_ptr();
+    this->m_networkData.m_timerTime = this->m_timer.getTimerPtr();
   }
-
-  this->server_.loopUpdateWebServer();
-
+  this->m_server.loopUpdateWebServer();
   // Update period in count state
-  if (*this->timer_register_ptr > this->prev_time &&
+  if (*this->m_timerRegisterPtr >  &&
        this->state == State::COUNT)
     this->update_display();
-  
   this->handle_reset_button();
 
   bool isSensorHigh = digitalRead(this->sensor_pin);

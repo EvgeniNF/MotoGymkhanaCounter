@@ -1,15 +1,9 @@
-
-#ifndef SERVER_NETWORKDATA_HPP
-#define SERVER_NETWORKDATA_HPP
+#pragma once
 
 struct NetworkData {
     /* data */
-    const unsigned long int* timer_time;
-    unsigned long int* time_on_esp;
-    unsigned short int* status;
-    std::string* host_name;
+    const unsigned long int* m_timerTime;
+    unsigned long int* m_timeOnEsp;
+    unsigned short int* m_espStatus;
+    std::string* m_hostName;
 };
-
-
-
-#endif // SERVER_NETWORKDATA_HPP
