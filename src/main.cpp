@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <logic.hpp>
-#include <MyTimer.hpp>
+#include <Timer.h>
 namespace pin{
 
 const int sensor{D1};

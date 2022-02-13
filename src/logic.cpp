@@ -67,7 +67,7 @@ void Logic::mainWork(){
   }
   this->m_server.loopUpdateWebServer();
   // Update period in count state
-  if (*this->m_timerRegisterPtr >  &&
+  if (*this->m_timerRegisterPtr > this->m_time &&
        this->state == State::COUNT)
     this->update_display();
   this->handle_reset_button();
