@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <Server.hpp>
 #include <MyTimer.hpp>
-#include <max7219_spi.hpp>
+#include <Max7219Spi.h>
 #include <NetworkData.hpp>
 
 

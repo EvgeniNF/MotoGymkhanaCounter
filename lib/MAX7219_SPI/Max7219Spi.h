@@ -1,10 +1,11 @@
-#ifndef MAX7219_SPI_MAX7219_SPI_HPP
-#define MAX7219_SPI_MAX7219_SPI_HPP
+#pragma once
+
 #include "Arduino.h"
+
 #include <pgmspace.h>
 #include <SPI.h>
 
-namespace max7219_spi{
+namespace max7219spi{
 
 const static byte charTable [] PROGMEM  = {
   B01111110, B00110000, B01101101, B01111001, B00110011, B01011011, B01011111, B01110000, // 000-007 :
@@ -25,50 +26,50 @@ const static byte charTable [] PROGMEM  = {
   B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000, B00000000  // 120-127 : x-[del]
 };
 
-class MAX7219_SPI{
+class Max7219Spi{
  
  public:
   /**
    * @brief Construct a new max7219 spi object
    * 
    */
-  MAX7219_SPI() = default;
+  Max7219Spi() = default;
   /**
    * @brief Construct a new max7219 spi object and start work whith display
    * 
-   * @param _cs_pin Chip select pin
+   * @param csPin Chip select pin
    */
-  explicit MAX7219_SPI(const int _cs_pin);
+  explicit Max7219Spi(const int csPin);
   /**
    * @brief Destroy the max7219 spi object
    * 
    */
-  ~MAX7219_SPI() = default;
+  ~Max7219Spi() = default;
   /**
    * @brief Function clear display
    * 
    */
-  void clear_display();
+  void clearDisplay();
   /**
    * @brief Set the digit object
    * 
    * @param digit Number of digit on display (0..7)
    * @param value Number (0..9)
-   * @param dp Dot status
+   * @param dot Dot status
    */
-  void set_digit(int digit, byte value, bool dp=false);
+  void setDigit(int digit, byte value, bool dot=false);
   /**
    * @brief Function init display
    * 
    * @param cs_pin Chip select pin
    */
-  void begin_display(int cs_pin);
+  void beginDisplay(int csPin);
   /**
    * @brief Shutdown mode
    * 
-   * @param b true - on, false - off 
+   * @param statusShutdonw true - on, false - off 
    */
-  void shutdown(bool b);
+  void shutdown(bool statusShutdonw);
   
  private:
   /**
@@ -77,25 +78,22 @@ class MAX7219_SPI{
    * @param opcode Function code
    * @param data Data
    */
-  void spi_transfer(volatile byte opcode, volatile byte data);
-  
- private:
-  enum class Status_display{
-    NOT_INIT,
-    RUN
+  void spiTransfer(volatile byte opcode, volatile byte data);
+  /**
+   * @brief Status of dispaly
+   * 
+   */
+  enum class STATUS_DISPLAY{
+    NOT_INIT, // Not init 
+    RUN       // Running
   };
-
- private:
   // Status display
-  Status_display status = Status_display::NOT_INIT;
+  STATUS_DISPLAY m_statusDisplay = STATUS_DISPLAY::NOT_INIT;
   // Select pin
-  int spi_cs = 0;
+  int m_csSpi = 0;
   // Transfer speed
-  unsigned long spi_speed = 1'000'000;
+  unsigned long m_spiSpeed = 1'000'000;
 
 };
 
 }
-
-
-#endif // MAX7219_SPI_MAX7219_SPI_HPP
