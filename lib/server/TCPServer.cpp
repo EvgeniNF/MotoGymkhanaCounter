@@ -10,6 +10,7 @@ const std::string set_ssid {"set_ssid"};
 const std::string set_password {"set_password"};
 const std::string get_settings {"get_settings"};
 const std::string reboot {"reboot"};
+const std::string reset_timer {"reset_timer"};
 
 }
 
@@ -94,7 +95,7 @@ void TCPServer::handleData(void* arg,
                         + std::to_string(*_data->timer_time)
                         + ';';
             responce += "time:" 
-                        + std::to_string(*_data->timer_time)
+                        + std::to_string(*_data->time_on_esp)
                         + ';';
             client->add(responce.c_str(), responce.size());
             client->send();
@@ -146,7 +147,9 @@ void TCPServer::handleData(void* arg,
                 client->send();
             }
         } else if (request == requests::reboot) {
-            ESP.restart();
+            this->callBackRebootFunction();
+        } else if (request == requests::reset_timer) {
+            this->callBackResetFunction();
         } else {
             client->add(responces::notFoundRequest.c_str(), 
                         responces::notFoundRequest.size());
@@ -158,6 +161,14 @@ void TCPServer::handleData(void* arg,
 
 void TCPServer::loopDNSRequestes() {
     this->dnsServer->processNextRequest();
+}
+
+void TCPServer::setRebootFunction(const std::function<void()>& function) {
+    this->callBackRebootFunction = function;
+}
+
+void TCPServer::setResetFunction(const std::function<void()>& function) {
+    this->callBackResetFunction = function;
 }
 
 }

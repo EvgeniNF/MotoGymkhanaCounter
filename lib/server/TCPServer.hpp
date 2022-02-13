@@ -20,6 +20,8 @@ class TCPServer{
     ~TCPServer() = default;
     void initializationTcpServer(NetworkData* data);
     void loopDNSRequestes();
+    void setRebootFunction(const std::function<void()>& function);
+    void setResetFunction(const std::function<void()>& function);
 
   private:  
     void handlerNewClient(void* arg, AsyncClient* client);
@@ -33,6 +35,8 @@ class TCPServer{
 
   private:
     
+    std::function<void()> callBackRebootFunction;
+    std::function<void()> callBackResetFunction;
     std::vector<AsyncClient*> clients;
     std::unique_ptr<AsyncServer> tcpServer;
     std::unique_ptr<DNSServer> dnsServer;

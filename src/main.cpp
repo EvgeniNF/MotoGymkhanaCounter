@@ -15,6 +15,7 @@ void IRAM_ATTR sensor_iterupt();
 void IRAM_ATTR button_iterupt();
 
 void setup() {
+  Serial.begin(11500);
   // Set pins mode
   logic.init_pins(pin::sensor, pin::button_reset, pin::indicator);
   // Iinit wifi

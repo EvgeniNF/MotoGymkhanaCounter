@@ -8,7 +8,9 @@ Server::Server() {
     this->httpServer = std::make_unique<HTTPServer>();
 }
 
-void Server::initializationServer(NetworkData* data) {
+void Server::initializationServer(NetworkData* data,
+                              const std::function<void()>& rebootFn,
+                              const std::function<void()>& resetFn) {
     WiFi.mode(WIFI_AP_STA);
   
     WiFi.softAPConfig(this->localIp,
@@ -19,7 +21,7 @@ void Server::initializationServer(NetworkData* data) {
     std::string pass {"19741974"};
     
     EEPROM.begin(201);
-    if (EEPROM.read(0) != 50) {
+    if (EEPROM.read(0) != 100) {
         
         EEPROM.write(1, static_cast<uint8_t>(ssid.size()));
         uint8_t offset = 2;
@@ -35,7 +37,7 @@ void Server::initializationServer(NetworkData* data) {
                          static_cast<uint8_t>(pass.at(index)));
         }
 
-        EEPROM.write(0, 50);
+        EEPROM.write(0, 100);
 
     } else {
         ssid.clear();
@@ -70,6 +72,8 @@ void Server::initializationServer(NetworkData* data) {
     this->httpServer->initializationUpdateServer();
     this->httpServer->initializationWebServer(data);
     this->tcpServer->initializationTcpServer(data);
+    this->tcpServer->setRebootFunction(rebootFn);
+    this->tcpServer->setResetFunction(resetFn);
 
 }
 

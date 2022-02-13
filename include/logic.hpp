@@ -81,6 +81,10 @@ class Logic{
    * @param value 
    */
   void set_digit_on_disp(int offset, int num_dig, int value);
+  
+  void reboot();
+
+  void resetTimer();
 
  private:
   /**

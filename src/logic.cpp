@@ -6,6 +6,7 @@ Logic::Logic()
             , timer_()
             , server_() {
   this->_data.timer_time = this->timer_.get_timer_ptr();
+  this->timer_register_ptr = this->timer_.get_timer_ptr();
   this->_data.time_on_esp = new unsigned long int(millis());
   this->_data.status = reinterpret_cast<unsigned short int*>(&this->state);
   state = Logic::State::NOT_INIT;
@@ -43,7 +44,9 @@ void Logic::init_display(int cs_disp_pin,
 
 void Logic::init_server(){
   // Init wifi server
-  this->server_.initializationServer(&this->_data);
+  this->server_.initializationServer(&this->_data,
+                std::bind(&Logic::reboot, this),
+                std::bind(&Logic::resetTimer, this));
   // Set state Display ready
   if (state == Logic::State::NOT_INIT)
     this->state = State::WIFI_INIT;
@@ -52,15 +55,30 @@ void Logic::init_server(){
 }
 
 void Logic::main_work(){
+  
   *this->_data.time_on_esp = millis();
+
+  if (this->state == State::STOPED) {
+    this->_data.timer_time = &result;
+  } else {
+    this->_data.timer_time = this->timer_.get_timer_ptr();
+  }
+
   this->server_.loopUpdateWebServer();
 
   // Update period in count state
-  if (*this->_data.timer_time > this->prev_time &&
+  if (*this->timer_register_ptr > this->prev_time &&
        this->state == State::COUNT)
     this->update_display();
   
   this->handle_reset_button();
+
+  bool isSensorHigh = digitalRead(this->sensor_pin);
+  if (isSensorHigh) {
+    digitalWrite(this->sensor_indicator_pin, HIGH);
+  } else {
+    digitalWrite(this->sensor_indicator_pin, LOW);
+  }
 }
 
 void Logic::sensor_signal(){
@@ -68,20 +86,20 @@ void Logic::sensor_signal(){
       this->state == Logic::State::DISPLAY_INIT ||
       this->state == Logic::State::WIFI_INIT) 
     return;
-  if (*this->_data.timer_time == 0 && this->state == State::READY){
+  if (*this->timer_register_ptr == 0 && this->state == State::READY){
     // Start timer
     this->update_display();
     this->timer_.start_timer(1);
     state = State::COUNT;
-  } else if (*this->_data.timer_time > 3'000 && this->state == State::COUNT){
+  } else if (*this->timer_register_ptr > 3'000 && this->state == State::COUNT){
     // Stop timer
     this->timer_.stop_timer();
-    this->result = *this->_data.timer_time;
+    this->result = *this->timer_register_ptr;
     this->update_display();
     this->timer_.reset_timer();
     this->timer_.start_timer(1);
     this->state = State::STOPED;
-  } else if (*this->_data.timer_time > 3'000 && this->state == State::STOPED){
+  } else if (*this->timer_register_ptr > 3'000 && this->state == State::STOPED){
     // Delay after stop timer
     this->timer_.stop_timer();
     this->timer_.reset_timer();
@@ -92,7 +110,7 @@ void Logic::sensor_signal(){
 }
 
 void Logic::update_display(){
-  this->prev_time = *this->_data.timer_time;
+  this->prev_time = *this->timer_register_ptr;
   int act_time = 0;
   for (int index = 0; index < 4; index++){
     act_time = static_cast<int>(this->prev_time / this->time_convers[index]);
@@ -106,7 +124,7 @@ void Logic::update_display(){
     else
       this->set_digit_on_disp(0, 3, act_time);         
   }
-  this->prev_time = *this->_data.timer_time + this->update_period;    
+  this->prev_time = *this->timer_register_ptr + this->update_period;    
 }
 
 void Logic::set_digit_on_disp(int offset, 
@@ -170,4 +188,18 @@ void Logic::init_pins(int _sensor_pin,
   pinMode(this->sensor_indicator_pin, OUTPUT);
   pinMode(this->button_reset_pin, INPUT_PULLUP);
   pinMode(this->sensor_pin, INPUT_PULLUP);
+}
+
+void Logic::reboot(){
+  this->display_.shutdown(true);
+  ESP.restart();
+}
+
+
+void Logic::resetTimer(){
+  this->timer_.stop_timer();
+  this->timer_.reset_timer();
+  this->update_display();
+
+  this->state = Logic::State::READY;
 }

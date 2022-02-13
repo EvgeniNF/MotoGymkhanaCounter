@@ -10,7 +10,9 @@ class Server{
   public:
     Server();
     ~Server() = default;
-    void initializationServer(NetworkData* data);
+    void initializationServer(NetworkData* data,
+                              const std::function<void()>& rebootFn,
+                              const std::function<void()>& resetFn);
     void loopUpdateWebServer();
 
   public:
