@@ -46,7 +46,7 @@ void TCPServer::initializationTcpServer(NetworkData* data) {
     this->tcpServer->onClient(functionNewClient, nullptr);
     this->tcpServer->begin();
     this->_data = data;
-    this->_data->host_name = &this->host;
+ //   this->_data->host_name = &this->host;
 }
 
 void TCPServer::handlerNewClient(void* arg,
@@ -89,13 +89,13 @@ void TCPServer::handleData(void* arg,
         std::string responce;
         if (request == requests::get_data) {
             responce += "state:" 
-                        + std::to_string(*_data->status)
+   //                     + std::to_string(*_data->status)
                         + ';';
             responce += "timer:" 
-                        + std::to_string(*_data->timer_time)
+   //                     + std::to_string(*_data->timer_time)
                         + ';';
             responce += "time:" 
-                        + std::to_string(*_data->time_on_esp)
+     //                   + std::to_string(*_data->time_on_esp)
                         + ';';
             client->add(responce.c_str(), responce.size());
             client->send();

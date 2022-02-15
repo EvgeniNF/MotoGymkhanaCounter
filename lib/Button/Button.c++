@@ -5,14 +5,36 @@
 namespace button
 {
 
-Button::Button(const int pinNo, unsigned int debounceTimeMs,
-               unsigned int holdTimeMs, int inputMode, bool interruptMode)
+Button::Button(int pinNo, unsigned int debounceTimeMs,
+               unsigned int holdTimeMs, int inputMode, bool buttonType, bool interruptMode)
     : m_pinNo(pinNo), m_debounceTimeMs(debounceTimeMs),
       m_holdTimeMs(holdTimeMs), m_intteruptMode(interruptMode)
 {
     // Set pin mode
     pinMode(this->m_pinNo, inputMode);
-
+    // Set button type
+    if (buttonType)
+    {
+        if (inputMode == INPUT_PULLUP) 
+        {
+            this->m_buttonType = BUTTON_TYPE::NC_PULLUP;
+        } 
+        else
+        {
+            this->m_buttonType = BUTTON_TYPE::NC;
+        } 
+    }
+    else
+    {
+        if (inputMode == INPUT_PULLUP) 
+        {
+            this->m_buttonType = BUTTON_TYPE::NO_PULLUP;
+        } 
+        else
+        {
+            this->m_buttonType = BUTTON_TYPE::NO;
+        } 
+    }
     if (this->m_intteruptMode)
     {
         // Set interrupt
@@ -27,85 +49,100 @@ Button::Button(const int pinNo, unsigned int debounceTimeMs,
 }
 void Button::interruptSignal()
 {
-    if (!this->m_stateButton)
+    // Get actual type
+    unsigned long int actualTime = millis();
+    // Check state
+    if (this->m_buttonState == BUTTON_STATE::WAIT_CLICK && actualTime > this->m_waitDebounceTime) 
     {
-        this->m_stateButton = true;
-        unsigned long int actualTime = millis();
+        // Set state debounce time
+        this->m_buttonState = BUTTON_STATE::IN_DEBOUNCE_TIME;
         this->m_checkTimeClick = actualTime + this->m_debounceTimeMs;
         this->m_checkTimeHold = actualTime + this->m_holdTimeMs;
-        this->m_clickedFlag = false;
-        this->m_holdedFlag = false;
-    }
-    else
-    {
-        if (this->m_clickedFlag || this->m_holdedFlag)
-        {
-            this->m_clickedFlag = false;
-            this->m_holdedFlag = false;
-        }
     }
 }
 bool Button::isClicked()
 {
-    if (this->m_stateButton && !this->m_clickedFlag)
+    // Check state
+    if (this->m_buttonState == BUTTON_STATE::IN_DEBOUNCE_TIME) 
     {
+        // Check time
         unsigned long int actualTime = millis();
-        if (actualTime > this->m_checkTimeClick)
+        if (actualTime > this->m_checkTimeClick) 
         {
-            bool actualStatePin = static_cast<bool>(digitalRead(this->m_pinNo));
-            if (actualStatePin)
-            {
-                this->m_clickedFlag = true;
-                return true;
-            }
-            else
-            {
-                this->m_clickedFlag = false;
-                this->m_holdedFlag = false;
-                this->m_stateButton = false;
-                return false;
-            }
+            // Set state
+            this->m_buttonState = BUTTON_STATE::IN_CLICK_TIME;
         }
-        else
-        {
-            return false;
-        }
-    }
-    else
+    } 
+    // Check state
+    if (this->m_buttonState == BUTTON_STATE::IN_CLICK_TIME)
     {
-        return false;
+        // Check pin
+        bool stateButtonPin = this->getStateButton();
+        if (!stateButtonPin)
+        {
+            this->m_waitDebounceTime = millis() + this->m_debounceTimeMs;
+            this->m_buttonState = BUTTON_STATE::WAIT_CLICK;
+            return true;
+        }
     }
+    return false;
 }
 bool Button::isHolded()
 {
-    if (this->m_stateButton && !this->m_holdedFlag)
+    // Check state
+    if (this->m_buttonState == BUTTON_STATE::IN_CLICK_TIME) 
     {
+        // Check time
         unsigned long int actualTime = millis();
-        if (actualTime > this->m_checkTimeHold)
+        if (actualTime > this->m_checkTimeHold) 
         {
-            bool actualStatePin = static_cast<bool>(digitalRead(this->m_pinNo));
-            if (actualStatePin)
-            {
-                this->m_holdedFlag = true;
-                return true;
-            }
-            else
-            {
-                this->m_clickedFlag = false;
-                this->m_holdedFlag = false;
-                this->m_stateButton = false;
-                return false;
-            }
+            // Set state
+            this->m_buttonState = BUTTON_STATE::IN_HOLD_TIME;
         }
-        else
+    } 
+    // Check state
+    if (this->m_buttonState == BUTTON_STATE::IN_HOLD_TIME)
+    {
+        // Check pin
+        bool stateButtonPin = this->getStateButton();
+        if (!stateButtonPin)
         {
-            return false;
+            this->m_waitDebounceTime = millis() + this->m_debounceTimeMs;
+            this->m_buttonState = BUTTON_STATE::WAIT_CLICK;
+            return true;
         }
     }
+    return false;
 }
 bool Button::getStateButton()
 {
-    return static_cast<bool>(digitalRead(this->m_pinNo));
+    switch (this->m_buttonType)
+    {
+    case BUTTON_TYPE::NC:
+        return !digitalRead(this->m_pinNo);
+    case BUTTON_TYPE::NO:
+        return digitalRead(this->m_pinNo);
+    case BUTTON_TYPE::NC_PULLUP:
+        return digitalRead(this->m_pinNo);
+    case BUTTON_TYPE::NO_PULLUP:
+        return !digitalRead(this->m_pinNo);
+    }
+}
+void Button::buttonNoInterruptHeandler()
+{
+    // Check state pin and button
+    bool stateButtonPin = this->getStateButton();
+    if (this->m_buttonState == BUTTON_STATE::WAIT_CLICK && stateButtonPin)
+    {
+        // Check button
+        unsigned long int actualTime = millis();
+        if (actualTime > this->m_waitDebounceTime) 
+        {
+            this->m_buttonState = BUTTON_STATE::IN_DEBOUNCE_TIME;
+            this->m_checkTimeClick = actualTime + this->m_debounceTimeMs;
+            this->m_checkTimeHold = actualTime + this->m_holdTimeMs;
+        }
+    }
 }
 
 } // namespace button

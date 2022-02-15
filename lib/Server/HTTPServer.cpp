@@ -32,9 +32,9 @@ void HTTPServer::initializationUpdateServer() {
 
 void HTTPServer::handleHomePage() {
     std::string req {"Moto-Gymkhana counter\n"};
-    req += "Timer time: " + std::to_string(*this->_data->timer_time) + "\n";
-    req += "Time on esp: " + std::to_string(*this->_data->time_on_esp) + "\n";
-    switch (*this->_data->status){
+ //   req += "Timer time: " + std::to_string(*this->_data->timer_time) + "\n";
+ //   req += "Time on esp: " + std::to_string(*this->_data->time_on_esp) + "\n";
+    switch (*this->_data->m_espStatus){
     case 0:
         req += "Status: Don't call init functions\n";
         break;
@@ -57,7 +57,7 @@ void HTTPServer::handleHomePage() {
     req += "IP address: " + std::string(WiFi.softAPIP().toString().c_str()) + "\n";
     req += "Access point name: " + std::string(WiFi.softAPSSID().c_str()) + "\n";
     req += "Password: " + std::string(WiFi.softAPPSK().c_str()) + "\n";
-    req += "TCP host name: " + *this->_data->host_name + "\n";
+//    req += "TCP host name: " + *this->_data->host_name + "\n";
     
     this->webServer->send(200, "text/plain", req.c_str());
 }
