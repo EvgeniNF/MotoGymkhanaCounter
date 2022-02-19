@@ -6,6 +6,8 @@
 #include <Timer.h>
 #include <Max7219Spi.h>
 #include <NetworkData.hpp>
+#include <Button.h>
+#include <Sensor.h>
 
 
 class Logic{
@@ -82,6 +84,17 @@ class Logic{
   void resetTimer();
 
  private:
+  
+  // Display
+  max7219spi::Max7219Spi m_display{};
+  // Timer
+  timer::Timer m_timer{};
+  // Server
+  server::Server m_server{};
+  // 
+  button::Button m_resetButton;
+  //
+  sensor::Sensor m_laserSensor;
   /**
    * @brief State of logic object
    */
@@ -103,12 +116,7 @@ class Logic{
   int m_sensorPin {0};
   // State
   STATE m_state {STATE::NOT_INIT};
-  // Display
-  max7219spi::Max7219Spi m_display{};
-  // Timer
-  timer::Timer m_timer{};
-  // Server
-  server::Server m_server{};
+  
   // Timer pointer
   const unsigned long int* m_timerRegisterPtr{};
   // Result of counter
