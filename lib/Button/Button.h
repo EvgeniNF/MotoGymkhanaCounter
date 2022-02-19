@@ -47,6 +47,14 @@ class Button
     void buttonNoInterruptHeandler();
 
   private:
+    // Number of pin
+    int m_pinNo;
+    // Debounce time
+    unsigned int m_debounceTimeMs;
+    // Hold time
+    unsigned int m_holdTimeMs;
+    // Intterupt mode false - Off, true - On
+    bool m_intteruptMode;
     /**
      * @brief State button enum
      */
@@ -75,14 +83,6 @@ class Button
      * @brief Heandler of interrupts
      */
     void IRAM_ATTR interruptSignal();
-    // Intterupt mode false - Off, true - On
-    bool m_intteruptMode{false};
-    // Debounce time
-    unsigned int m_debounceTimeMs{0};
-    // Hold time
-    unsigned int m_holdTimeMs{0};
-    // Number of pin
-    int m_pinNo{0};
     // Time for check click
     unsigned long int m_checkTimeClick{0};
     // Time for check hold

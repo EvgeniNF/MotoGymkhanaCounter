@@ -119,13 +119,15 @@ bool Button::getStateButton()
     switch (this->m_buttonType)
     {
     case BUTTON_TYPE::NC:
-        return !digitalRead(this->m_pinNo);
+        return (!static_cast<bool>(digitalRead(this->m_pinNo)));
     case BUTTON_TYPE::NO:
-        return digitalRead(this->m_pinNo);
+        return (static_cast<bool>(digitalRead(this->m_pinNo)));
     case BUTTON_TYPE::NC_PULLUP:
-        return digitalRead(this->m_pinNo);
+        return (static_cast<bool>(digitalRead(this->m_pinNo)));
     case BUTTON_TYPE::NO_PULLUP:
-        return !digitalRead(this->m_pinNo);
+        return (!static_cast<bool>(digitalRead(this->m_pinNo)));
+    default:
+        return false;
     }
 }
 void Button::buttonNoInterruptHeandler()
