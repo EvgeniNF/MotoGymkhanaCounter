@@ -1,6 +1,4 @@
-
-#ifndef SERVER_HTTPSERVER_HPP
-#define SERVER_HTTPSERVER_HPP
+#pragma once
 
 #include <memory>
 #include <string>
@@ -32,13 +30,11 @@ class HTTPServer {
     HTTPServer& operator=(const HTTPServer&) = delete;
 
   private:
-    std::unique_ptr<ESP8266WebServer> webServer;
-    std::unique_ptr<ESP8266HTTPUpdateServer> httpUpdateServer;
-    const unsigned int http_port {80};
-    std::string _updateHostname {"update"};
-    NetworkData* _data {nullptr};
+    std::unique_ptr<ESP8266WebServer> m_webServer;
+    std::unique_ptr<ESP8266HTTPUpdateServer> m_httpUpdateServer;
+    static constexpr unsigned int httpPort {80};
+    std::string m_updateHostName {"update"};
+    NetworkData* m_transiveData {nullptr};
 };
 
 }
-
-#endif // SERVER_HTTPSERVER_HPP

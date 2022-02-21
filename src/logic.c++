@@ -17,10 +17,10 @@ Logic::Logic()
                     configs::laser_sensor::interruptMode,
                     configs::laser_sensor::filterTime)
 {
-    this->m_networkData.m_espStatus =
+    this->m_networkData.espStatus =
         reinterpret_cast<unsigned short int*>(&this->m_espStatus);
-    this->m_networkData.m_timeOnEsp = &this->m_systemTime;
-    this->m_networkData.m_timerTime = this->m_timer.getTimerPtr();
+    this->m_networkData.timeOnEsp = &this->m_systemTime;
+    this->m_networkData.timerTime = this->m_timer.getTimerPtr();
     this->m_sensorIndicatorPin = configs::indicator_led_configs::ledPinNo;
     this->m_displayUpdatePeriod = configs::display::updatePeriodDisplay;
     this->m_laserSensor.setCallbackFunction(

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <string>
+
 struct NetworkData {
     /* data */
-    const unsigned long int* m_timerTime;
-    unsigned long int* m_timeOnEsp;
-    unsigned short int* m_espStatus;
-    std::string* m_hostName;
+    const unsigned long int* timerTime;
+    unsigned long int* timeOnEsp;
+    unsigned short int* espStatus;
+    std::string* hostName;
 };

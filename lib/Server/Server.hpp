@@ -1,12 +1,13 @@
-#ifndef SERVER_SERVER_HPP
-#define SERVER_SERVER_HPP
+#pragma once
 
 #include "HTTPServer.hpp"
 #include "TCPServer.hpp"
 
-namespace server {
+namespace server
+{
 
-class Server{
+class Server
+{
   public:
     Server();
     ~Server() = default;
@@ -21,15 +22,13 @@ class Server{
     Server& operator=(const Server&) = delete;
 
   private:
-    std::unique_ptr<TCPServer> tcpServer;
-    std::unique_ptr<HTTPServer> httpServer;
-    IPAddress localIp {192, 168, 100, 1};
-    IPAddress gateway {192, 168, 100, 1};
-    IPAddress subnet  {255, 255, 255, 0};
-    const unsigned int wifiChanel {8};
-    const unsigned int maxNumConnections {15};
+    std::unique_ptr<TCPServer> m_tcpServer;
+    std::unique_ptr<HTTPServer> m_httpServer;
+    IPAddress m_localIp{192, 168, 100, 1};
+    IPAddress m_gateway{192, 168, 100, 1};
+    IPAddress m_subnet{255, 255, 255, 0};
+    const unsigned int m_wifiChanel{8};
+    const unsigned int m_maxNumConnections{15};
 };
 
-}
-
-#endif // SERVER_SERVER_HPP
+} // namespace server
