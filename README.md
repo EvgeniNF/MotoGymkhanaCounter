@@ -1,14 +1,15 @@
 # Moto-Gymkhana counter #
-The telemetry system is used to measure the time between start and finish in circuit racing
+* The telemetry system is used to measure the time between start and finish in circuit racing
 ---
 ## Board ##
-ESP8266
+* ESP8266
+---
 ## Dependens ##
 1. ArduinoCore
 2. ESPAsyncTCP 
 ---
 ## Build system ##
-platformio
+* platformio
 ---
 ## Use pins: ##
 1. D1 - sensor (NPN laser sensor)
@@ -22,5 +23,5 @@ platformio
 3. Data transfer via wifi
 ---
 ## Links ##
-https://grabcad.com/library/telemetry-system-1
-https://platformio.org/
+* https://grabcad.com/library/telemetry-system-1
+* https://platformio.org/
