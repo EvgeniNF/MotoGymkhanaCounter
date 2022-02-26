@@ -1,4 +1,4 @@
-#include "Button.h"
+#include "Button.hpp"
 
 #include <FunctionalInterrupt.h>
 
@@ -47,6 +47,7 @@ Button::Button(int pinNo, unsigned int debounceTimeMs,
         }
     }
 }
+
 void Button::interruptSignal()
 {
     // Get actual type
@@ -60,6 +61,7 @@ void Button::interruptSignal()
         this->m_checkTimeHold = actualTime + this->m_holdTimeMs;
     }
 }
+
 bool Button::isClicked()
 {
     // Check state
@@ -87,6 +89,7 @@ bool Button::isClicked()
     }
     return false;
 }
+
 bool Button::isHolded()
 {
     // Check state
@@ -114,6 +117,7 @@ bool Button::isHolded()
     }
     return false;
 }
+
 bool Button::getStateButton()
 {
     switch (this->m_buttonType)
@@ -130,6 +134,7 @@ bool Button::getStateButton()
         return false;
     }
 }
+
 void Button::buttonNoInterruptHeandler()
 {
     // Check state pin and button

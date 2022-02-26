@@ -14,21 +14,23 @@ class Sensor
      * @brief Construct a new Sensor object
      * @param pinNo  Number of sensor pin
      * @param inputMode Sensor pin mode
-     * @param interruptMode Interrupt mode 
+     * @param interruptMode Interrupt mode
      * @param filterTime Filter time
      */
-    explicit Sensor(int pinNo, int inputMode,
-               int interruptMode, unsigned int filterTime);
+    explicit Sensor(int pinNo, int inputMode, int interruptMode,
+                    unsigned int filterTime);
     /**
      * @brief Destroy the Sensor object
      */
     ~Sensor() = default;
+
+  public:
     /**
      * @brief Set the Callback Function object
      * @param function New callback function
      */
     void setCallbackFunction(const std::function<void()>& function);
-  
+
   private:
     /**
      * @brief Sensor interrupt heandler

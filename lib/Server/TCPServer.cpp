@@ -1,4 +1,5 @@
 #include "TCPServer.hpp"
+#include "../../include/configs.hpp"
 #include "EEPROM.h"
 
 namespace server
@@ -18,41 +19,34 @@ const std::string reset_timer{"reset_timer"};
 
 namespace responces
 {
-
 const std::string notFoundRequest{"Error! Request not found."};
 const std::string ssidWrited{"ssid writed"};
 const std::string settingNotWrited{"Error! Setting not writed."};
 const std::string passWrited{"pass writed"};
-
 } // namespace responces
 
 TCPServer::TCPServer()
 {
-    this->m_tcpServer = std::make_unique<AsyncServer>(this->m_tcpPort);
-    this->m_dnsServer = std::make_unique<DNSServer>();
-}
-
-TCPServer::TCPServer(const std::string& hostName)
-{
-    this->m_tcpServer = std::make_unique<AsyncServer>(this->m_tcpPort);
-    this->m_dnsServer = std::make_unique<DNSServer>();
-    this->m_host = hostName;
+    m_tcpServer =
+        std::make_unique<AsyncServer>(configs::network_settings::tcpPort);
+    m_dnsServer = std::make_unique<DNSServer>();
 }
 
 void TCPServer::initializationTcpServer(NetworkData* data)
 {
-    this->m_dnsServer->start(this->m_dnsPort, this->m_host.c_str(),
-                             WiFi.softAPIP());
+    m_dnsServer->start(configs::network_settings::dnsPort,
+                       configs::network_settings::tcpHostName, WiFi.softAPIP());
+
     auto functionNewClient =
         std::bind(&TCPServer::handlerNewClient, this, std::placeholders::_1,
                   std::placeholders::_2);
-    this->m_tcpServer->onClient(functionNewClient, nullptr);
-    this->m_tcpServer->begin();
-    this->m_transiveData = data;
-    this->m_transiveData->hostName = &this->m_host;
+
+    m_tcpServer->onClient(functionNewClient, nullptr);
+    m_tcpServer->begin();
+    m_transiveData = data;
 }
 
-void TCPServer::handlerNewClient(void* arg, AsyncClient* client)
+void TCPServer::handlerNewClient(void*, AsyncClient* client)
 {
     auto functionData = std::bind(&TCPServer::handleData, this,
                                   std::placeholders::_1, std::placeholders::_2,
@@ -60,22 +54,24 @@ void TCPServer::handlerNewClient(void* arg, AsyncClient* client)
     auto functionDisconnect =
         std::bind(&TCPServer::handleDisconnect, this, std::placeholders::_1,
                   std::placeholders::_2);
-    this->m_clients.push_back(client);
+    m_clients.push_back(client);
     client->onData(functionData, nullptr);
     client->onDisconnect(functionDisconnect, nullptr);
 }
 
-void TCPServer::handleDisconnect(void* arg, AsyncClient* client)
+void TCPServer::handleDisconnect(void*, AsyncClient* client)
 {
-    auto lambda = [client](const AsyncClient* arg2) {
-        return client == arg2 ? true : false;
+    auto lambda = [client](const AsyncClient* activeClient) {
+        return client == activeClient ? true : false;
     };
+
     auto disconectedClient =
-        std::find_if(this->m_clients.begin(), this->m_clients.end(), lambda);
-    this->m_clients.erase(disconectedClient);
+        std::find_if(m_clients.begin(), m_clients.end(), lambda);
+    
+    m_clients.erase(disconectedClient);
 }
 
-void TCPServer::handleData(void* arg, AsyncClient* client, void* data,
+void TCPServer::handleData(void*, AsyncClient* client, void* data,
                            size_t len)
 {
     std::string request;
@@ -106,7 +102,7 @@ void TCPServer::handleData(void* arg, AsyncClient* client, void* data,
             client->add(responce.c_str(), responce.size());
             client->send();
         }
-        else if (request.find(requests::set_password) != std::string::npos)
+        else if (request == requests::set_password)
         {
             responce = request.substr(request.find(':') + 1);
             if (responce.size() < 100)
@@ -131,7 +127,7 @@ void TCPServer::handleData(void* arg, AsyncClient* client, void* data,
                 client->send();
             }
         }
-        else if (request.find(requests::set_ssid) != std::string::npos)
+        else if (request == requests::set_ssid)
         {
             responce = request.substr(request.find(':') + 1);
             if (responce.size() < 100)
@@ -158,11 +154,11 @@ void TCPServer::handleData(void* arg, AsyncClient* client, void* data,
         }
         else if (request == requests::reboot)
         {
-            this->m_callBackRebootFunction();
+            m_callBackRebootFunction();
         }
         else if (request == requests::reset_timer)
         {
-            this->m_callBackResetFunction();
+            m_callBackResetFunction();
         }
         else
         {
@@ -173,16 +169,16 @@ void TCPServer::handleData(void* arg, AsyncClient* client, void* data,
     }
 }
 
-void TCPServer::loopDNSRequestes() { this->m_dnsServer->processNextRequest(); }
+void TCPServer::loopDNSRequestes() { m_dnsServer->processNextRequest(); }
 
-void TCPServer::setRebootFunction(const std::function<void()>& function)
+void TCPServer::setRebootFunction(std::function<void()> const& rebootFunction)
 {
-    this->m_callBackRebootFunction = function;
+    m_callBackRebootFunction = rebootFunction;
 }
 
-void TCPServer::setResetFunction(const std::function<void()>& function)
+void TCPServer::setResetFunction(std::function<void()> const& resetFunction)
 {
-    this->m_callBackResetFunction = function;
+    m_callBackResetFunction = resetFunction;
 }
 
 } // namespace server

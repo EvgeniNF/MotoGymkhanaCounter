@@ -2,12 +2,12 @@
 
 #include <Arduino.h>
 
-#include <Button.h>
-#include <Max7219Spi.h>
+#include <Button.hpp>
+#include <Max7219Spi.hpp>
 #include <NetworkData.hpp>
-#include <Sensor.h>
+#include <Sensor.hpp>
 #include <Server.hpp>
-#include <Timer.h>
+#include <Timer.hpp>
 
 class Logic
 {
@@ -20,10 +20,12 @@ class Logic
      * @brief Destroy the Logic object
      */
     ~Logic() = default;
+
+  public:
     /**
-     * @brief Loop function
+     * @brief Loop work
      */
-    void mainWork();
+    void loopWork();
 
   private:
     /**
@@ -58,28 +60,28 @@ class Logic
      */
     void setDigitOnDisplay(int offset, int num_dig, int value);
     /**
-     * @brief 
-     * 
+     * @brief
+     *
      */
     void updateSystemTime();
     /**
-     * @brief 
-     * 
+     * @brief
+     *
      */
     void updateSensorIndicator();
     /**
-     * @brief 
-     * 
+     * @brief
+     *
      */
     void reboot();
     /**
-     * @brief 
-     * 
+     * @brief
+     *
      */
     void sensorIvent();
     /**
-     * @brief 
-     * 
+     * @brief
+     *
      */
     void resetTimer();
     /**

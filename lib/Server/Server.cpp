@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "../../include/configs.hpp"
 #include <EEPROM.h>
 
 namespace server
@@ -16,15 +17,25 @@ void Server::initializationServer(NetworkData* data,
 {
     WiFi.mode(WIFI_AP_STA);
 
-    WiFi.softAPConfig(this->m_localIp, this->m_gateway, this->m_subnet);
+    WiFi.softAPConfig({configs::network_settings::localIp[0],
+                       configs::network_settings::localIp[1],
+                       configs::network_settings::localIp[2],
+                       configs::network_settings::localIp[3]},
+                      {configs::network_settings::getway[0],
+                       configs::network_settings::getway[1],
+                       configs::network_settings::getway[2],
+                       configs::network_settings::getway[3]},
+                      {configs::network_settings::mask[0],
+                       configs::network_settings::mask[1],
+                       configs::network_settings::mask[2],
+                       configs::network_settings::mask[3]});
 
-    std::string ssid{"MotoCounetr1"};
-    std::string pass{"19741974"};
+    std::string ssid{configs::network_settings::softApName};
+    std::string pass{configs::network_settings::softApPassword};
 
     EEPROM.begin(201);
-    if (EEPROM.read(0) != 100)
+    if (EEPROM.read(0) != configs::network_settings::firstNumForWriteSettings)
     {
-
         EEPROM.write(1, static_cast<uint8_t>(ssid.size()));
         uint8_t offset = 2;
         for (size_t index = 0; index < ssid.size(); ++index)
@@ -65,23 +76,26 @@ void Server::initializationServer(NetworkData* data,
     EEPROM.end();
     Serial.println(ssid.c_str());
     Serial.println(pass.c_str());
-    while (!WiFi.softAP(ssid.c_str(), pass.c_str(), this->m_wifiChanel, false,
-                        this->m_maxNumConnections))
+    while (!WiFi.softAP(ssid.c_str(), pass.c_str(),
+                        configs::network_settings::wifiChanel, 0,
+                        configs::network_settings::maxNumConnecteions))
     {
         delay(100);
     }
 
-    this->m_httpServer->initializationUpdateServer();
-    this->m_httpServer->initializationWebServer(data);
-    this->m_tcpServer->initializationTcpServer(data);
-    this->m_tcpServer->setRebootFunction(rebootFn);
-    this->m_tcpServer->setResetFunction(resetFn);
+    m_httpServer->initializationUpdateServer();
+    m_httpServer->initializationWebServer(data);
+    m_httpServer->setRebootFunction(rebootFn);
+    m_httpServer->setResetFunction(resetFn);
+    m_tcpServer->initializationTcpServer(data);
+    m_tcpServer->setRebootFunction(rebootFn);
+    m_tcpServer->setResetFunction(resetFn);
 }
 
 void Server::loopUpdateWebServer()
 {
-    this->m_httpServer->handleClinets();
-    this->m_tcpServer->loopDNSRequestes();
+    m_httpServer->handleClinets();
+    m_tcpServer->loopDNSRequestes();
 }
 
 } // namespace server

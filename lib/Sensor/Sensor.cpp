@@ -1,4 +1,4 @@
-#include "Sensor.h"
+#include "Sensor.hpp"
 
 #include <FunctionalInterrupt.h>
 
@@ -21,15 +21,15 @@ Sensor::Sensor(int pinNo, int inputMode, int interruptMode,
 }
 void Sensor::setCallbackFunction(const std::function<void()>& function)
 {
-    this->m_callbackFunction = function;
+    m_callbackFunction = function;
 }
 void Sensor::interruptHeandler()
 {
     unsigned long int actualTime = millis();
-    if (actualTime > this->m_nextTime)
+    if (actualTime > m_nextTime)
     {
-        this->m_callbackFunction();
-        this->m_nextTime = actualTime + m_filterTime;
+        m_callbackFunction();
+        m_nextTime = actualTime + m_filterTime;
     }
 }
 

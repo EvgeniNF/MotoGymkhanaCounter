@@ -1,4 +1,4 @@
-#include "logic.h"
+#include "Logic.hpp"
 #include <Arduino.h>
 
 Logic telemetria;

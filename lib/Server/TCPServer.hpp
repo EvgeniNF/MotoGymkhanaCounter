@@ -16,32 +16,67 @@ class TCPServer
 {
   public:
     TCPServer();
-    explicit TCPServer(const std::string& hostName);
+
     ~TCPServer() = default;
-    void initializationTcpServer(NetworkData* data);
-    void loopDNSRequestes();
-    void setRebootFunction(const std::function<void()>& function);
-    void setResetFunction(const std::function<void()>& function);
 
-  private:
-    void handlerNewClient(void* arg, AsyncClient* client);
-    void handleData(void* arg, AsyncClient* client, void* data, size_t len);
-    void handleDisconnect(void* arg, AsyncClient* client);
-
-  public:
     TCPServer(TCPServer&) = delete;
+
     TCPServer(TCPServer&&) = delete;
+
     TCPServer& operator=(const TCPServer&) = delete;
 
+  public:
+    /**
+     * @brief Tcp server initialization
+     * @param data Data for transfer
+     */
+    void initializationTcpServer(NetworkData* data);
+    /**
+     * @brief Loop for DNS server
+     */
+    void loopDNSRequestes();
+    /**
+     * @brief Set the Reboot Function object
+     * @param function Callback reboot function
+     */
+    void setRebootFunction(std::function<void()> const& rebootFunction);
+    /**
+     * @brief Set the Reset Function object
+     * @param function Callback reset function
+     */
+    void setResetFunction(std::function<void()> const& resetFunction);
+
   private:
+    /**
+     * @brief Handle connect new clients
+     * @param client Connected tcp client
+     */
+    void handlerNewClient(void*, AsyncClient* client);
+    /**
+     * @brief Handle request data
+     * @param client Client who send request
+     * @param data Client data
+     * @param len Len data
+     */
+    void handleData(void*, AsyncClient* client, void* data, size_t len);
+    /**
+     * @brief Handle disconnect client
+     * @param client Disconnected client
+     */
+    void handleDisconnect(void*, AsyncClient* client);
+
+  private:
+    /// Callback reboot function
     std::function<void()> m_callBackRebootFunction;
+    /// Callback reset function
     std::function<void()> m_callBackResetFunction;
+    /// Tcp clients
     std::vector<AsyncClient*> m_clients;
+    /// Tcp server
     std::unique_ptr<AsyncServer> m_tcpServer;
+    /// Dns server
     std::unique_ptr<DNSServer> m_dnsServer;
-    std::string m_host{"tcp.server"};
-    const unsigned int m_tcpPort{7050};
-    const unsigned int m_dnsPort{53};
+    /// Network transive data
     NetworkData* m_transiveData{nullptr};
 };
 

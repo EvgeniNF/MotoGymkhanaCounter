@@ -14,15 +14,19 @@ class Button
      * @param debounceTimeMs Debounce time
      * @param holdTimeMs Hold time
      * @param inputMode Input mode INPUT or INPUT_PULLUP
-     * @param buttonType Norm close or norm open contact, NC -> true, NO -> false 
+     * @param buttonType Norm close or norm open contact, NC -> true, NO ->
+     * false
      * @param interruptMode Interrupt mode true -> On, false -> Off
      */
     explicit Button(int pinNo, unsigned int debounceTimeMs,
-                    unsigned int holdTimeMs, int inputMode, bool buttonType, bool interruptMode);
+                    unsigned int holdTimeMs, int inputMode, bool buttonType,
+                    bool interruptMode);
     /**
      * @brief Destroy the Button object
      */
     ~Button() = default;
+
+  public:
     /**
      * @brief Check click button
      * @return true if clicked
@@ -60,10 +64,10 @@ class Button
      */
     enum class BUTTON_STATE
     {
-      WAIT_CLICK,
-      IN_DEBOUNCE_TIME,
-      IN_CLICK_TIME,
-      IN_HOLD_TIME
+        WAIT_CLICK,
+        IN_DEBOUNCE_TIME,
+        IN_CLICK_TIME,
+        IN_HOLD_TIME
     };
     // Button state var
     Button::BUTTON_STATE m_buttonState{Button::BUTTON_STATE::WAIT_CLICK};
@@ -72,10 +76,10 @@ class Button
      */
     enum class BUTTON_TYPE
     {
-      NO_PULLUP,
-      NC_PULLUP,
-      NO,
-      NC
+        NO_PULLUP,
+        NC_PULLUP,
+        NO,
+        NC
     };
     // Button type var
     Button::BUTTON_TYPE m_buttonType{Button::BUTTON_TYPE::NC};
