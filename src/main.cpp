@@ -1,53 +1,8 @@
+#include "Logic.hpp"
 #include <Arduino.h>
-#include <logic.hpp>
 
-namespace pin{
+Logic telemetria;
 
-const int sensor{D1};
-const int button_reset{D2};
-const int indicator{D3};
+void setup() {}
 
-}
-
-Logic logic;
-
-
-
-void IRAM_ATTR sensor_iterupt();
-void IRAM_ATTR button_iterupt();
-
-void setup() {
-  // Set pins mode
-  logic.init_pins(pin::sensor, pin::button_reset, pin::indicator);
-
-  // Iinit wifi
-  logic.init_wifi_server("MotoCounter1",
-                "19741974", 
-                {192, 168, 100, 1},
-                {192, 168, 100, 1},
-                {255, 255, 255, 0},
-                80);
-  
-  // Init dispalay 
-  logic.init_display(D8);
-  
-  // Set interrupt functions
-  attachInterrupt(digitalPinToInterrupt(pin::sensor), sensor_iterupt, FALLING);
-  attachInterrupt(digitalPinToInterrupt(pin::button_reset), button_iterupt, CHANGE);
-}
-
-void loop() {
-  // Main work
-  logic.main_work();
-}
-
-void sensor_iterupt(){
-  // Sensor interupt
-  logic.sensor_signal();
-}
-
-void button_iterupt(){
-  // Button interupt
-  logic.reset_button_signal();
-}
-
+void loop() { telemetria.loopWork(); }
