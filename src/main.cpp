@@ -5,4 +5,4 @@ Logic telemetria;
 
 void setup() {}
 
-void loop() { telemetria.mainWork(); }
+void loop() { telemetria.loopWork(); }
