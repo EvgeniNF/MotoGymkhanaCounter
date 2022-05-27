@@ -1,11 +1,14 @@
 #pragma once
 
 #include <Arduino.h>
-
+#include <Timer.hpp>
 #include <functional>
+
 
 namespace sensor
 {
+
+using FilterTimer = timer::TickTimer;
 
 class Sensor
 {
@@ -31,17 +34,23 @@ class Sensor
      */
     void setCallbackFunction(const std::function<void()>& function);
 
+    void attach() noexcept;
+
   private:
     /**
      * @brief Sensor interrupt heandler
      */
     void IRAM_ATTR interruptHeandler();
-    /// Filter time
-    unsigned int m_filterTime;
-    /// Next time work callback function
-    unsigned long int m_nextTime;
+
+  private:
+    /// Interrupt input pin
+    int m_interruptPin;
+    /// Interrupt mode
+    int m_interruotMode;
     /// CallbackFunction
     std::function<void()> m_callbackFunction;
+    /// Timer
+    FilterTimer m_filterTimer;
 };
 
 } // namespace sensor

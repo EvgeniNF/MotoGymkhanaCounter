@@ -8,7 +8,7 @@ namespace configs
 namespace reset_button
 {
 constexpr int buttonPinNo{D2};
-constexpr unsigned int debounceTimeMs{100};
+constexpr unsigned int debounceTimeMs{400};
 constexpr unsigned int holdTimeMs{1000};
 constexpr int inputMode{INPUT_PULLUP};
 constexpr bool buttonType{false};
@@ -20,7 +20,7 @@ namespace laser_sensor
 constexpr int sensorPinNo{D1};
 constexpr unsigned inputMode{INPUT_PULLUP};
 constexpr int interruptMode{FALLING};
-constexpr unsigned int filterTime{3000};
+constexpr unsigned int filterTime{5000};
 } // namespace laser_sensor
 
 namespace indicator_led_configs

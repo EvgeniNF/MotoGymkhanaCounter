@@ -73,4 +73,19 @@ class Timer
     std::shared_ptr<TimerData> m_timerData;
 };
 
+class TickTimer {
+  public:
+    TickTimer(uint16 tickTime, std::function<void()> const& callbackFunction);
+    ~TickTimer() = default;
+    void startOnece() noexcept;
+
+  private:
+    static void ICACHE_FLASH_ATTR tickInterrupt(void* arg);
+   
+  private: 
+    std::function<void()> m_callback;
+    uint16 m_tickTime;
+    os_timer_t m_timer; 
+};
+
 } // namespace timer
