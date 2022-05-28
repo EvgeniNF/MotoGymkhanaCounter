@@ -44,13 +44,13 @@ class Sensor
 
   private:
     /// Interrupt input pin
-    int m_interruptPin;
+    int const m_interruptPin;
     /// Interrupt mode
-    int m_interruotMode;
-    /// CallbackFunction
-    std::function<void()> m_callbackFunction;
+    int const m_interruotMode;
     /// Timer
     FilterTimer m_filterTimer;
+    /// CallbackFunction
+    std::function<void()> m_callbackFunction;
 };
 
 } // namespace sensor

@@ -7,12 +7,13 @@ namespace sensor
 
 Sensor::Sensor(int pinNo, int inputMode, int interruptMode,
                unsigned int filterTime) :
+    m_interruptPin(digitalPinToInterrupt(pinNo)), m_interruotMode(interruptMode),
     m_filterTimer(filterTime, std::bind(&Sensor::attach, this))
 {
     // Set pin mode
     pinMode(pinNo, inputMode);
     // Set interrupt
-    m_interruptPin = digitalPinToInterrupt(pinNo);
+    detachInterrupt(m_interruptPin);
     attach();
 }
 

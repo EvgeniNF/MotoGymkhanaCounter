@@ -20,7 +20,7 @@ namespace laser_sensor
 constexpr int sensorPinNo{D1};
 constexpr unsigned inputMode{INPUT_PULLUP};
 constexpr int interruptMode{FALLING};
-constexpr unsigned int filterTime{5000};
+constexpr unsigned int filterTime{50000};
 } // namespace laser_sensor
 
 namespace indicator_led_configs
