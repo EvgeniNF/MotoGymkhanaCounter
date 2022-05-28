@@ -41,6 +41,7 @@ Button::Button(int pinNo, unsigned int debounceTimeMs,
         int interruptPin = digitalPinToInterrupt(this->m_pinNo);
         if (interruptPin != NOT_AN_INTERRUPT)
         {
+            detachInterrupt(interruptPin);
             // Binding interrupt function
             attachInterrupt(interruptPin,
                             std::bind(&Button::interruptSignal, this), CHANGE);

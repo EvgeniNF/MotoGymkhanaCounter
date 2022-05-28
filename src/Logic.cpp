@@ -11,6 +11,7 @@ Logic::Logic()
                     configs::reset_button::inputMode,
                     configs::reset_button::buttonType,
                     configs::reset_button::interruptMode),
+
       m_laserSensor(configs::laser_sensor::sensorPinNo,
                     configs::laser_sensor::inputMode,
                     configs::laser_sensor::interruptMode,
@@ -104,7 +105,7 @@ void Logic::loopWork()
 {
     updateSystemTime();
     if (m_resetButton.isClicked())
-    {
+    {   
         resetTimer();
     }
     if (m_resetButton.isHolded())
